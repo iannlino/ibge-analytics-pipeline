@@ -170,4 +170,4 @@ print("- Gráfico 4 (Vulnerabilidade) gerado com sucesso!")
 # 5. FINALIZAÇÃO
 # =====================================================================
 conexao.close()
-print("\nMissão cumprida! Todos os 4 gráficos estão guardados na sua pasta.")
+print("\n Todos os 4 gráficos estão guardados na pasta.")
