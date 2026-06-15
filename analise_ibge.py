@@ -6,9 +6,8 @@ import matplotlib.pyplot as plt
 # 0. INICIALIZAÇÃO E LIGAÇÃO À BASE DE DADOS
 # =====================================================================
 print("A ligar à base de dados e a iniciar a extração de dados...")
-# Usando o caminho absoluto exato e validado pelo detetive
-caminho_banco = r'C:\Users\iannl\Desktop\BigDataTratado\projeto_ibge.sqlite'
-conexao = sqlite3.connect(r'C:\Users\iannl\Desktop\BigDataTratado\projeto_ibge.sqlite')
+caminho_banco = r'projeto_ibge.sqlite'
+conexao = sqlite3.connect(r'projeto_ibge.sqlite')
 
 
 # =====================================================================
@@ -24,10 +23,12 @@ LIMIT 10;
 """
 df_densidade = pd.read_sql_query(query_densidade, conexao)
 
-plt.figure(figsize=(10, 5))
+plt.figure(figsize=(12, 6))
 barras_densidade = plt.bar(df_densidade['uf'], df_densidade['densidade'], color='#0284c7')
 plt.title('Top 10 UFs com Maior Densidade Demográfica', fontweight='bold')
 plt.ylabel('Habitantes por km²')
+
+plt.xticks(rotation=45, ha='right')
 
 for barra in barras_densidade:
     yval = barra.get_height()
@@ -79,10 +80,12 @@ ORDER BY frota_veiculos DESC;
 """
 df_frota = pd.read_sql_query(query_frota, conexao)
 
-plt.figure(figsize=(10, 5))
+plt.figure(figsize=(12, 6))
 barras_frota = plt.bar(df_frota['uf'], df_frota['frota_veiculos'] / 1000000, color='#ea580c')
 plt.title('Pressão Logística: Estados com Frota Acima da Média Nacional', fontweight='bold')
 plt.ylabel('Volume da Frota (em Milhões)')
+
+plt.xticks (rotation=45, ha='right')
 
 for barra in barras_frota:
     yval = barra.get_height()
@@ -114,6 +117,8 @@ ax1.set_ylabel('Rendimento Per Capita (R$)', color='#dc2626', fontweight='bold')
 ax1.plot(df_vuln['uf'], df_vuln['rendimento_per_capita'], color='#dc2626', marker='o', linewidth=2, label='Renda')
 ax1.tick_params(axis='y', labelcolor='#dc2626')
 ax1.set_ylim(0, 1600)
+
+plt.setp(ax1.get_xticklabels(), rotation=45, ha='right')
 
 ax2 = ax1.twinx()  
 ax2.set_ylabel('Qtd. Matrículas no Ens. Fundamental', color='#3b82f6', fontweight='bold')
