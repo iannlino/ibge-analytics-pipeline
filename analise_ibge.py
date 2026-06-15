@@ -15,16 +15,25 @@ conexao = sqlite3.connect(r'projeto_ibge.sqlite')
 # =====================================================================
 query_densidade = """
 SELECT 
-    uf, 
-    (populacao_residente / area_territorial) AS densidade
-FROM estatisticas_ibge
-ORDER BY densidade DESC
+    uf,
+    populacao_residente,
+    area_territorial,
+    ROUND((populacao_residente / area_territorial), 2) AS densidade_demografica,
+    CASE 
+        WHEN (populacao_residente / area_territorial) > 100 THEN 'ALTA - Foco: Transporte de Massa (Metrô/BRT)'
+        WHEN (populacao_residente / area_territorial) BETWEEN 20 AND 100 THEN 'MODERADA - Foco: Integração Intermunicipal'
+        ELSE 'BAIXA - Foco: Logística de Longa Distância'
+    END AS status_planejamento_urbano
+FROM 
+    estatisticas_ibge
+ORDER BY 
+    densidade_demografica DESC
 LIMIT 10;
 """
 df_densidade = pd.read_sql_query(query_densidade, conexao)
 
 plt.figure(figsize=(12, 6))
-barras_densidade = plt.bar(df_densidade['uf'], df_densidade['densidade'], color='#0284c7')
+barras_densidade = plt.bar(df_densidade['uf'], df_densidade['densidade_demografica'], color='#0284c7')
 plt.title('Top 10 UFs com Maior Densidade Demográfica', fontweight='bold')
 plt.ylabel('Habitantes por km²')
 
@@ -44,11 +53,20 @@ print("- Gráfico 1 (Densidade) gerado com sucesso!")
 # =====================================================================
 query_regiao = """
 SELECT 
-    regiao, 
-    AVG(idh) AS media_idh
-FROM estatisticas_ibge
-GROUP BY regiao
-ORDER BY media_idh DESC;
+    regiao,
+    ROUND(AVG(idh), 3) AS media_idh,
+    ROUND(AVG(rendimento_per_capita), 2) AS media_rendimento,
+    CASE 
+        WHEN AVG(idh) < 0.700 THEN 'ALERTA VERMELHO - Prioridade Máxima para Repasses e Assistência'
+        WHEN AVG(idh) BETWEEN 0.700 AND 0.750 THEN 'ATENÇÃO - Necessita de Incentivos Fiscais e Industriais'
+        ELSE 'ESTÁVEL - Foco em Manutenção e Inovação Tecnológica'
+    END AS status_alocacao_recursos
+FROM 
+    estatisticas_ibge
+GROUP BY 
+    regiao
+ORDER BY 
+    media_idh DESC;
 """
 df_regiao = pd.read_sql_query(query_regiao, conexao)
 
@@ -72,11 +90,20 @@ print("- Gráfico 2 (IDH Regiões) gerado com sucesso!")
 # =====================================================================
 query_frota = """
 SELECT 
-    uf, 
-    frota_veiculos
-FROM estatisticas_ibge
-WHERE frota_veiculos > (SELECT AVG(frota_veiculos) FROM estatisticas_ibge)
-ORDER BY frota_veiculos DESC;
+    uf,
+    regiao,
+    frota_veiculos,
+    CASE 
+        WHEN frota_veiculos > 5000000 THEN 'CRÍTICO - Risco Iminente de Colapso Logístico e Ambiental'
+        WHEN frota_veiculos BETWEEN 3000000 AND 5000000 THEN 'ALTO - Necessidade de Expansão de Malha Metroviária'
+        ELSE 'MODERADO - Viável para Políticas de Transição Energética Iniciais'
+    END AS alerta_mobilidade_urbana
+FROM 
+    estatisticas_ibge
+WHERE 
+    frota_veiculos > (SELECT AVG(frota_veiculos) FROM estatisticas_ibge)
+ORDER BY 
+    frota_veiculos DESC;
 """
 df_frota = pd.read_sql_query(query_frota, conexao)
 
@@ -101,12 +128,20 @@ print("- Gráfico 3 (Frota de Veículos) gerado com sucesso!")
 # =====================================================================
 query_vulnerabilidade = """
 SELECT 
-    uf, 
-    rendimento_per_capita, 
-    matriculas_ensino_fundamental
-FROM estatisticas_ibge
-WHERE rendimento_per_capita < 1500.00 AND matriculas_ensino_fundamental > 200000
-ORDER BY rendimento_per_capita ASC;
+    uf,
+    rendimento_per_capita,
+    matriculas_ensino_fundamental,
+    CASE 
+        WHEN rendimento_per_capita < 1000.00 THEN 'INTERVENÇÃO IMEDIATA - Cesta Básica Escolar e Bolsa Família'
+        ELSE 'SUPORTE CONTÍNUO - Manutenção de Merenda Reforçada e Repasses do Fundeb'
+    END AS diretriz_ministerio_cidadania
+FROM 
+    estatisticas_ibge
+WHERE 
+    rendimento_per_capita < 1500.00 
+    AND matriculas_ensino_fundamental > 200000
+ORDER BY 
+    rendimento_per_capita ASC;
 """
 df_vuln = pd.read_sql_query(query_vulnerabilidade, conexao)
 
