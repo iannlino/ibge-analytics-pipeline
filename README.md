@@ -1,4 +1,5 @@
 # 📊 IBGE Analytics Pipeline - Engenharia de Dados
+Equipe: Iann Luca Rocha Lino, Gustavo Peixoto De Oliveira Dias
 
 Este projeto é um pipeline analítico automatizado focado na extração, higienização e visualização de dados socioeconômicos do IBGE, desenvolvido como requisito de avaliação em Engenharia de Software.
 
